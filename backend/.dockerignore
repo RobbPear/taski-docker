@@ -1,0 +1,9 @@
+venv
+.git
+db.sqlite3 
+.idea, 
+.vscode
+.env
+
+# Описание инструкций докерфайла есть в официальной документации на docs.docker.com. 
+# Там же описан и файл .dockerignore.

@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -59,12 +60,31 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': '/data/db.sqlite3',
+#     }
+# }
+
+# Этими строчками замените текущую настройку DATABASES
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        # Меняем настройку Django: теперь для работы будет использоваться
+        # бэкенд postgresql
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('POSTGRES_DB', 'django'),
+        'USER': os.getenv('POSTGRES_USER', 'django'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
+        'HOST': os.getenv('DB_HOST', ''),
+        'PORT': os.getenv('DB_PORT', 5432)
     }
 }
+
+# В DATABASES указаны дефолтные значения для переменных — эти значения пригодятся, 
+# если база будет развёрнута на локальном сервере, без использования файла .env. 
+# Значения переменных заданы иные, чем в .env, чтобы в коде репозитория не оказалось
+# секретных данных — паролей от реальных баз. 
 
 
 # Password validation
@@ -103,7 +123,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
+# При планировании архитектуры было решено,
+# что статические файлы Django должны быть доступны по адресу /static/
 STATIC_URL = '/static/'
+# Указываем корневую директорию для сборки статических файлов;
+# в контейнере это будет /app/collected_static
+STATIC_ROOT = BASE_DIR / 'collected_static'
+# Теперь при вызове команды python manage.py collectstatic
+# Django будет копировать все статические файлы в директорию collected_static
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
